@@ -59,7 +59,13 @@ footer{text-align:center;font-size:.75rem;color:#888;padding:14px}
 <p style="font-size:.8rem;color:#666;margin:10px 0 0">Para cada afirmativa, marque a nota que descreve a criança <b>atualmente</b>:<br>
 <b>0</b> — não demonstra · <b>1</b> — demonstra com apoio físico/total · <b>2</b> — demonstra com apoio verbal/monitoramento · <b>3</b> — demonstra de forma emergente/intermitente · <b>4</b> — demonstra de forma consistente e independente.</p>
 </div>
-SECOES_PLACEHOLDER
+<div id="sec0"></div>
+<div id="sec1"></div>
+<div id="sec2"></div>
+<div id="sec3"></div>
+<div id="sec4"></div>
+<div id="sec5"></div>
+<div id="sec6"></div>
 <button type="submit" class="enviar" id="btn">Enviar protocolo</button>
 <div id="falta"></div>
 </form>
@@ -72,12 +78,12 @@ SECOES_PLACEHOLDER
 </main>
 <footer>Tríade Espaço Terapêutico — Socially Savvy Checklist (tradução adaptada)</footer>
 <script>
-var URL_WEBHOOK = "WEBHOOK_PLACEHOLDER";
+var URL_WEBHOOK = "https://maestro.adapta.one/webhooks/generic/e8f51112a337e0d66b4105a170bae5fd513550822e2c017ad62b8f01147e0dc3?secret=88df003b46b609d7d208bca6095ab0a940ac00fb7e9791eb1f6add0b759dc45d";
 var form = document.getElementById('form');
-var codes = Array.from(document.querySelectorAll('.item')).map(function(d){return d.dataset.code;});
+var codes = [];
 function atualiza(){
   var resp = codes.filter(function(c){return form.querySelector('[name="'+c+'"]:checked');}).length;
-  var pct = Math.round(resp*100/codes.length);
+  var pct = codes.length ? Math.round(resp*100/codes.length) : 0;
   document.getElementById('pct').textContent = pct+'%';
   document.getElementById('num').textContent = resp+'/'+codes.length;
   document.getElementById('fill').style.width = pct+'%';
@@ -85,11 +91,15 @@ function atualiza(){
     var tot = sec.querySelectorAll('.item').length;
     var ok = sec.querySelectorAll('input:checked').length;
     var cnt = sec.querySelector('.cnt');
-    cnt.textContent = ok+'/'+tot;
-    cnt.style.color = ok===tot ? '#c8f7c5' : '#ffe9a8';
+    if(cnt){ cnt.textContent = ok+'/'+tot; cnt.style.color = ok===tot ? '#c8f7c5' : '#ffe9a8'; }
   });
 }
-form.addEventListener('change', atualiza); atualiza();
+function savvy_init(){
+  codes = Array.from(document.querySelectorAll('.item')).map(function(d){return d.dataset.code;});
+  atualiza();
+}
+document.addEventListener('savvy-pronto', savvy_init);
+form.addEventListener('change', atualiza);
 form.addEventListener('submit', function(ev){
   ev.preventDefault();
   var faltando = codes.filter(function(c){return !form.querySelector('[name="'+c+'"]:checked');});
@@ -117,6 +127,15 @@ form.addEventListener('submit', function(ev){
     document.getElementById('ok').style.display='block';
     window.scrollTo(0,0);
   }
+});
+</script>
+<script>
+var SECOES = ['sec0.html','sec1.html','sec2.html','sec3.html','sec4.html','sec5.html','sec6.html'];
+var BASE = location.pathname.replace(/[^/]*$/,'');
+Promise.all(SECOES.map(function(s,k){
+  return fetch(BASE+s).then(function(r){return r.text();}).then(function(t){document.getElementById('sec'+k).innerHTML=t;});
+})).then(function(){
+  document.dispatchEvent(new Event('savvy-pronto'));
 });
 </script>
 </body>
