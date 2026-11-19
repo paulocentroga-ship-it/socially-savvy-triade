@@ -1,1 +1,123 @@
-PLACEHOLDER_SUBSTITUIDO_PELO_PUSH_FILES
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socially Savvy Checklist — Tríade</title>
+<style>
+:root{--roxo:#9D77B4;--verde:#889977;--cinza:#f4f2f7}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--cinza);color:#2b2b2b}
+header{background:var(--roxo);color:#fff;padding:18px 16px;text-align:center}
+header h1{margin:0;font-size:1.25rem}
+header p{margin:6px 0 0;font-size:.85rem;opacity:.92}
+main{max-width:860px;margin:0 auto;padding:12px}
+.card{background:#fff;border-radius:10px;padding:14px;margin:12px 0;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.idgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.idgrid label{font-size:.8rem;font-weight:bold;display:block;margin-bottom:3px;color:#555}
+.idgrid input{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:.95rem}
+.area h2{background:var(--roxo);color:#fff;padding:8px 12px;border-radius:8px;font-size:1rem;margin:18px 0 8px}
+.area h2 .cnt{float:right;font-size:.8rem;font-weight:normal;opacity:.9}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 10px;border-bottom:1px solid #eee;background:#fff}
+.item:nth-child(even){background:#faf8fc}
+.item .txt{font-size:.88rem;line-height:1.35}
+.item .txt b{color:var(--roxo)}
+.ops{display:flex;gap:4px;flex-shrink:0}
+.op input{position:absolute;opacity:0;width:0}
+.op span{display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;border:1.5px solid #ccc;border-radius:6px;font-size:.85rem;cursor:pointer;user-select:none}
+.op input:checked+span{background:var(--roxo);color:#fff;border-color:var(--roxo)}
+#barra{position:sticky;top:0;z-index:5;background:#fff;border-bottom:2px solid var(--roxo);padding:6px 12px;font-size:.85rem;display:flex;align-items:center;gap:10px}
+#barra .track{flex:1;height:8px;background:#e5e0ec;border-radius:4px;overflow:hidden}
+#barra .fill{height:100%;width:0;background:var(--verde);transition:width .2s}
+.enviar{display:block;width:100%;margin:20px 0;padding:14px;background:var(--verde);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:bold;cursor:pointer}
+.enviar:disabled{background:#bbb;cursor:not-allowed}
+#falta{color:#b00020;font-size:.85rem;margin-top:8px;display:none}
+#ok{display:none;text-align:center;padding:30px 16px}
+#ok .big{font-size:2.6rem}
+footer{text-align:center;font-size:.75rem;color:#888;padding:14px}
+@media(max-width:640px){.item{flex-direction:column;align-items:stretch}.ops{justify-content:flex-end}}
+</style>
+</head>
+<body>
+<header>
+<h1>Socially Savvy Checklist</h1>
+<p>Perfil de habilidades sociais e emocionais — Tríade Espaço Terapêutico</p>
+</header>
+<div id="barra"><span id="pct">0%</span><div class="track"><div class="fill" id="fill"></div></div><span id="num">0/110</span></div>
+<main>
+<form id="form">
+<div class="card">
+<div class="idgrid">
+<div><label>Criança / paciente *</label><input name="crianca" required></div>
+<div><label>Data de nascimento</label><input name="nascimento" placeholder="dd/mm/aaaa"></div>
+<div><label>Idade na avaliação</label><input name="idade" placeholder="ex.: 5 anos e 3 meses"></div>
+<div><label>Data da avaliação *</label><input name="data_avaliacao" required placeholder="dd/mm/aaaa"></div>
+<div><label>Avaliador(a) *</label><input name="avaliador" required></div>
+<div><label>Avaliação nº (1 a 4)</label>
+<select name="numero_avaliacao"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+</div>
+<p style="font-size:.8rem;color:#666;margin:10px 0 0">Para cada afirmativa, marque a nota que descreve a criança <b>atualmente</b>:<br>
+<b>0</b> — não demonstra · <b>1</b> — demonstra com apoio físico/total · <b>2</b> — demonstra com apoio verbal/monitoramento · <b>3</b> — demonstra de forma emergente/intermitente · <b>4</b> — demonstra de forma consistente e independente.</p>
+</div>
+SECOES_PLACEHOLDER
+<button type="submit" class="enviar" id="btn">Enviar protocolo</button>
+<div id="falta"></div>
+</form>
+<div id="ok">
+<div class="big">✅</div>
+<h2>Protocolo enviado com sucesso!</h2>
+<p>Protocolo nº <b id="proto"></b></p>
+<p style="font-size:.9rem;color:#555">As pontuações e os gráficos foram enviados automaticamente para a equipe da Tríade. Guarde este número se precisar de contato.</p>
+</div>
+</main>
+<footer>Tríade Espaço Terapêutico — Socially Savvy Checklist (tradução adaptada)</footer>
+<script>
+var URL_WEBHOOK = "WEBHOOK_PLACEHOLDER";
+var form = document.getElementById('form');
+var codes = Array.from(document.querySelectorAll('.item')).map(function(d){return d.dataset.code;});
+function atualiza(){
+  var resp = codes.filter(function(c){return form.querySelector('[name="'+c+'"]:checked');}).length;
+  var pct = Math.round(resp*100/codes.length);
+  document.getElementById('pct').textContent = pct+'%';
+  document.getElementById('num').textContent = resp+'/'+codes.length;
+  document.getElementById('fill').style.width = pct+'%';
+  document.querySelectorAll('.area').forEach(function(sec){
+    var tot = sec.querySelectorAll('.item').length;
+    var ok = sec.querySelectorAll('input:checked').length;
+    var cnt = sec.querySelector('.cnt');
+    cnt.textContent = ok+'/'+tot;
+    cnt.style.color = ok===tot ? '#c8f7c5' : '#ffe9a8';
+  });
+}
+form.addEventListener('change', atualiza); atualiza();
+form.addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var faltando = codes.filter(function(c){return !form.querySelector('[name="'+c+'"]:checked');});
+  var faltaEl = document.getElementById('falta');
+  if(faltando.length){
+    faltaEl.style.display='block';
+    faltaEl.textContent = 'Faltam '+faltando.length+' item(ns): '+faltando.slice(0,12).join(', ')+(faltando.length>12?'…':'');
+    var primeiro = form.querySelector('[name="'+faltando[0]+'"]');
+    if(primeiro) primeiro.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  faltaEl.style.display='none';
+  var btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  var fd = new FormData(form);
+  var payload = {teste:false, protocolo:'SS-'+Date.now().toString(36).toUpperCase(), enviado_em:new Date().toISOString()};
+  fd.forEach(function(v,k){payload[k]=v;});
+  codes.forEach(function(c){var el=form.querySelector('[name="'+c+'"]:checked');payload[c]=parseInt(el.value,10);});
+  fetch(URL_WEBHOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(payload)})
+   .then(function(){fin();}).catch(function(){fin();});
+  function fin(){
+    document.getElementById('proto').textContent = payload.protocolo;
+    form.style.display='none';
+    document.getElementById('barra').style.display='none';
+    document.getElementById('ok').style.display='block';
+    window.scrollTo(0,0);
+  }
+});
+</script>
+</body>
+</html>
